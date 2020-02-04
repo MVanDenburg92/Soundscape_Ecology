@@ -427,6 +427,177 @@ cor.test(x, y)
 
 
 
+#Plot Code
+
+#Just as we used the mean and standard deviation to summarize a single variable,
+#we can summarize the relationship between these two variables by finding the
+#line that best follows their association. 
+#Use the following interactive function to select the line that you think does
+#the best job of going through the cloud of points.
+
+
+
+#After running this command, you’ll be prompted to click two points on the plot
+#to define a line. Once you’ve done that, the line you specified will be shown
+#in black and the residuals in blue. Note that there are 30 residuals,
+#one for each of the 30 observations. 
+#Recall that the residuals are the difference between the observed values 
+#and the values predicted by the line:
+
+#ei=yi−y^i
+
+#The most common way to do linear regression is to select the line that 
+#minimizes the sum of squared residuals. To visualize the squared residuals,
+#you can rerun the plot command and add the argument showSquares = TRUE.
+
+
+
+plot_ss(x = mlb11$at_bats, y = mlb11$runs, showSquares = TRUE))
+
+#Note that the output from the plot_ss function provides you with the slope
+#and intercept of your line as well as the sum of squares.
+
+
+#Linear Model Code: 
+
+m1 <- lm(runs ~ at_bats, data = mlb11)
+
+
+#The first argument in the function lm is a formula that takes the form y ~ x. 
+#Here it can be read that we want to make a linear model of runs as a function 
+#of at_bats. The second argument specifies that R should look in the mlb11 data 
+#frame to find the runs and at_bats variables.
+
+#The output of lm is an object that contains all of the
+#information we need about
+#the linear model that was just fit. We can access this information using
+#the summary function.
+
+summary(m1)
+
+
+#Prediction and prediction errors
+#Let’s create a scatterplot with the least squares line laid on top.
+
+plot(mlb11$runs ~ mlb11$at_bats)
+abline(m1)
+
+
+#To assess whether the linear model is reliable, we need to check for (1)
+#linearity, (2) nearly normal residuals, and (3) constant variability.
+
+#Linearity: You already checked if the relationship between runs and at-bats 
+#is linear using a scatterplot. We should also verify this condition with a plot
+#of the residuals vs. at-bats. Recall that any code following a 
+# is intended to be a comment that helps understand the code but is ignored by R.
+
+plot(m1$residuals ~ mlb11$at_bats)
+abline(h = 0, lty = 3)  # adds a horizontal dashed line at y = 0
+
+
+
+#Nearly normal residuals: To check this condition, we can look at a histogram
+
+hist(m1$residuals)
+
+#or a normal probability plot of the residuals.
+
+qqnorm(m1$residuals)
+qqline(m1$residuals)  # adds diagonal line to the normal prob plot
+
+
+
+
+
+
+
+
+
+
+
+#2.1.4 Subsetting and replacement with dplyr
+#Now that we have seen how to index/subset data.frames, we’ll look at how that 
+#is done with dplyr. In a word, it is quite different. First, read about the 
+#dplyr grammar, which provides a set of “verbs” that are designed to replace 
+#many of the base R approaches for manipulating data.frames, including how you
+#index them (you may also wish to read the chapter on data transformation in
+#R For Data Science).
+
+#Here we will focus on just indexing and replacement, using a slighly larger
+#version of d, noting the dplyr works on data.frames as well as tibble:
+  
+#   # Chunk 1
+#   set.seed(1)
+# d <- data.frame(a = letters[1:7], b = 1:7, c = runif(n = 7, min = 0, max = 20))
+# d
+# #>   a b         c
+# #> 1 a 1  5.310173
+# #> 2 b 2  7.442478
+# #> 3 c 3 11.457067
+# #> 4 d 4 18.164156
+# #> 5 e 5  4.033639
+# #> 6 f 6 17.967794
+# #> 7 g 7 18.893505
+# #
+# # #1
+# d %>% filter(a %in% c("a", "e")) %>% select(a, b)
+# #>   a b
+# #> 1 a 1
+# #> 2 e 5
+# #
+# # #2
+# d %>% filter(c > 7 & c < 18) %>% select(-b)
+# #>   a         c
+# #> 1 b  7.442478
+# #> 2 c 11.457067
+# #> 3 f 17.967794
+# #
+# # #3
+# d %>% filter(a == "c")
+# #>   a b        c
+# #> 1 c 3 11.45707
+# # 
+# # 4
+# d %>% slice(c(1:2, 7))
+# #>   a b         c
+# #> 1 a 1  5.310173
+# #> 2 b 2  7.442478
+# #> 3 g 7 18.893505
+
+# A bunch of new stuff up there, which is first noticeable in #1:
+#
+
+
+# First, there’s the %>%, which is the “pipe” operator, which dplyr imports from 
+# magrittr (a tidyverse package). It passes (or pipes) whatever is on the 
+# lefthand side to the operation defined on the right-hand side, which allows one
+# to chain together multiple operations in a single command sequence
+
+# We pipe d to dplyr’s filter function, which is used to find rows based on their
+# values. We use the same sort of logical indexing syntax as in our previous
+# subsetting examples, in this case looking for values “a” and “e” in column a.
+# However, one difference is that we don’t have to wrap a in quotes. This is a 
+# feature of dplyr functions, which makes coding more efficient
+
+# Having found the matching rows, we then narrow our selection to just columns a 
+# and b by using the select function to pull the columns we want. Note that we
+# don’t have to wrap a and b in quotes, or within a c()
+
+
+# In #2 we see how we find values in c that fall between 7 and 18, and then 
+# select columns a and c by negative reference on b. Note that dplyr::select 
+# the negative reference to be applied right to the column name, which you can’t 
+# do in a matrix or data.frame
+# 
+# In #3 using filter without select simply returns the matching row across all 
+# columns. #4 introduces the slice function, which lets us select by row number.
+
+
+
+
+
+
+
 
 
 
